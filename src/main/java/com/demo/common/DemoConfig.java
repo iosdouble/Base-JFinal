@@ -1,9 +1,10 @@
 package com.demo.common;
 
-import com.demo.blog.BlogController;
+
 import com.demo.common.model._MappingKit;
-import com.demo.index.IndexController;
-import com.demo.swagger.SwaggerRoutes;
+
+import com.demo.route.ApiRoutes;
+
 import com.jfinal.config.Constants;
 import com.jfinal.config.Handlers;
 import com.jfinal.config.Interceptors;
@@ -14,8 +15,13 @@ import com.jfinal.kit.Prop;
 import com.jfinal.kit.PropKit;
 import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
 import com.jfinal.plugin.druid.DruidPlugin;
+import com.jfinal.render.ViewType;
 import com.jfinal.server.undertow.UndertowServer;
 import com.jfinal.template.Engine;
+import live.autu.plugin.jfinal.swagger.config.SwaggerPlugin;
+import live.autu.plugin.jfinal.swagger.config.routes.SwaggerRoutes;
+import live.autu.plugin.jfinal.swagger.model.SwaggerApiInfo;
+import live.autu.plugin.jfinal.swagger.model.SwaggerDoc;
 
 /**
  * 本 demo 仅表达最为粗浅的 jfinal 用法，更为有价值的实用的企业级用法
@@ -31,7 +37,8 @@ public class DemoConfig extends JFinalConfig {
 	 * 启动入口，运行此 main 方法可以启动项目，此 main 方法可以放置在任意的 Class 类定义中，不一定要放于此
 	 */
 	public static void main(String[] args) {
-		UndertowServer.start(DemoConfig.class);
+//		UndertowServer.start(DemoConfig.class);
+		UndertowServer.create(DemoConfig.class,"undertow.properties").start();
 	}
 	
 	/**
@@ -50,16 +57,30 @@ public class DemoConfig extends JFinalConfig {
 	public void configConstant(Constants me) {
 		loadConfig();
 		
-		me.setDevMode(p.getBoolean("devMode", false));
+		me.setDevMode(p.getBoolean("devMode"));
+		//设置默认上传文件保存路径 getFile等使用
+		me.setBaseUploadPath("upload/temp/");
 		
 		/**
 		 * 支持 Controller、Interceptor、Validator 之中使用 @Inject 注入业务层，并且自动实现 AOP
 		 * 注入动作支持任意深度并自动处理循环注入
 		 */
 		me.setInjectDependency(true);
-		
+
 		// 配置对超类中的属性进行注入
 		me.setInjectSuperClass(true);
+
+		//设置上传最大限制尺寸
+		//me.setMaxPostSize(1024*1024*10);
+		//设置默认下载文件路径 renderFile使用
+		me.setBaseDownloadPath("download");
+		//设置默认视图类型
+		me.setViewType(ViewType.JFINAL_TEMPLATE);
+		//设置404渲染视图
+		//me.setError404View("404.html");
+
+		//设置启用依赖注入
+		me.setInjectDependency(true);
 	}
 	
 	/**
@@ -69,7 +90,7 @@ public class DemoConfig extends JFinalConfig {
 		//推荐拆分方式 如果需要就解开注释 创建对应的 Routes
 		//me.add(new AdminRoutes());//配置后台管理系统路由
 		//me.add(new FrontRoutes());//配置网站前台路由
-//		me.add(new ApiRoutes());//配置API访问路由
+		me.add(new ApiRoutes());//配置API访问路由
 		//me.add(new WechatRoutes());//配置微信端访问路由
 
 //		me.add("/", IndexController.class, "/index");	// 第三个参数为该Controller的视图存放路径
@@ -77,10 +98,15 @@ public class DemoConfig extends JFinalConfig {
 
 		me.add(new SwaggerRoutes());
 	}
+
+
 	
 	public void configEngine(Engine me) {
-		me.addSharedFunction("/common/_layout.html");
-		me.addSharedFunction("/common/_paginate.html");
+		//配置模板支持热加载
+		me.setDevMode(p.getBoolean("engineDevMode", false));
+		//这里只有选择JFinal TPL的时候才用
+		//配置共享函数模板
+		//me.addSharedFunction("/view/common/layout.html")
 	}
 	
 	/**
@@ -90,6 +116,9 @@ public class DemoConfig extends JFinalConfig {
 		// 配置 druid 数据库连接池插件
 		DruidPlugin druidPlugin = new DruidPlugin(p.get("jdbcUrl"), p.get("user"), p.get("password"));
 		me.add(druidPlugin);
+
+		me.add(new SwaggerPlugin(new SwaggerDoc().setBasePath("/").setHost("127.0.0.1").setSwagger("2.0")
+				.setInfo(new SwaggerApiInfo("jfinal swagger demo", "1.0", "jfinal swagger", ""))));
 		
 		// 配置ActiveRecord插件
 		ActiveRecordPlugin arp = new ActiveRecordPlugin(druidPlugin);
