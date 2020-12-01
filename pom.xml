@@ -58,6 +58,11 @@
 			<artifactId>jfinal</artifactId>
 			<version>4.9.01</version>
 		</dependency>
+		<dependency>
+			<groupId>com.jfinal</groupId>
+			<artifactId>jfinal-weixin</artifactId>
+			<version>2.6</version>
+		</dependency>
 
 		<!-- jfinal-undertow 开发、部署一体化 web 服务器 -->
 		<dependency>

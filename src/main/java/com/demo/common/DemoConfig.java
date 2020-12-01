@@ -18,6 +18,10 @@ import com.jfinal.plugin.druid.DruidPlugin;
 import com.jfinal.render.ViewType;
 import com.jfinal.server.undertow.UndertowServer;
 import com.jfinal.template.Engine;
+import com.jfinal.weixin.sdk.api.ApiConfig;
+import com.jfinal.weixin.sdk.api.ApiConfigKit;
+import com.jfinal.wxaapp.WxaConfig;
+import com.jfinal.wxaapp.WxaConfigKit;
 import live.autu.plugin.jfinal.swagger.config.SwaggerPlugin;
 import live.autu.plugin.jfinal.swagger.config.routes.SwaggerRoutes;
 import live.autu.plugin.jfinal.swagger.model.SwaggerApiInfo;
@@ -57,7 +61,7 @@ public class DemoConfig extends JFinalConfig {
 	public void configConstant(Constants me) {
 		loadConfig();
 		
-		me.setDevMode(p.getBoolean("devMode"));
+		me.setDevMode(p.getBoolean("devMode",false));
 		//设置默认上传文件保存路径 getFile等使用
 		me.setBaseUploadPath("upload/temp/");
 		
@@ -78,9 +82,6 @@ public class DemoConfig extends JFinalConfig {
 		me.setViewType(ViewType.JFINAL_TEMPLATE);
 		//设置404渲染视图
 		//me.setError404View("404.html");
-
-		//设置启用依赖注入
-		me.setInjectDependency(true);
 	}
 	
 	/**
@@ -145,5 +146,58 @@ public class DemoConfig extends JFinalConfig {
 	 */
 	public void configHandler(Handlers me) {
 		
+	}
+
+
+	@Override
+	public void afterJFinalStart() {
+		// 1.5 之后支持redis存储access_token、js_ticket，需要先启动RedisPlugin
+		// ApiConfigKit.setAccessTokenCache(new RedisAccessTokenCache());
+		// 1.6新增的2种初始化
+		// ApiConfigKit.setAccessTokenCache(new RedisAccessTokenCache(Redis.use("weixin")));
+		// ApiConfigKit.setAccessTokenCache(new RedisAccessTokenCache("weixin"));
+
+		ApiConfig ac = new ApiConfig();
+		// 配置微信 API 相关参数
+		//ac.setToken(PropKit.get("token"));
+		ac.setAppId(PropKit.get("appId"));
+		ac.setAppSecret(PropKit.get("appSecret"));
+
+		/**
+		 *  是否对消息进行加密，对应于微信平台的消息加解密方式：
+		 *  1：true进行加密且必须配置 encodingAesKey
+		 *  2：false采用明文模式，同时也支持混合模式
+		 */
+		//ac.setEncryptMessage(PropKit.getBoolean("encryptMessage", false));
+		//ac.setEncodingAesKey(PropKit.get("encodingAesKey", "setting it in config file"));
+
+		/**
+		 * 多个公众号时，重复调用ApiConfigKit.putApiConfig(ac)依次添加即可，第一个添加的是默认。
+		 */
+		ApiConfigKit.putApiConfig(ac);
+
+		/**
+		 * 1.9 新增LocalTestTokenCache用于本地和线上同时使用一套appId时避免本地将线上AccessToken冲掉
+		 *
+		 * 设计初衷：https://www.oschina.net/question/2702126_2237352
+		 *
+		 * 注意：
+		 * 1. 上线时应保证此处isLocalDev为false，或者注释掉该不分代码！
+		 *
+		 * 2. 为了安全起见，此处可以自己添加密钥之类的参数，例如：
+		 * http://localhost/weixin/api/getToken?secret=xxxx
+		 * 然后在WeixinApiController#getToken()方法中判断secret
+		 *
+		 * @see WeixinApiController#getToken()
+		 */
+		//if (isLocalDev) {
+		//    String onLineTokenUrl = "http://localhost/weixin/api/getToken";
+		//    ApiConfigKit.setAccessTokenCache(new LocalTestTokenCache(onLineTokenUrl));
+		//}
+
+		WxaConfig wc = new WxaConfig();
+		wc.setAppId("wxf4cb2eb2702bbf8f");
+		wc.setAppSecret("a6c6ac54a3a31841dfb534fd5dee6849");
+		WxaConfigKit.setWxaConfig(wc);
 	}
 }
