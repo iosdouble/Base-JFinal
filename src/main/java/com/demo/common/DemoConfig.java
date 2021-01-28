@@ -3,8 +3,10 @@ package com.demo.common;
 
 import com.demo.common.model._MappingKit;
 
+import com.demo.interceptor.ExceptionInterceptor;
 import com.demo.route.ApiRoutes;
 
+import com.demo.utils.GlobalActionInterceptor;
 import com.jfinal.config.Constants;
 import com.jfinal.config.Handlers;
 import com.jfinal.config.Interceptors;
@@ -138,7 +140,10 @@ public class DemoConfig extends JFinalConfig {
 	 * 配置全局拦截器
 	 */
 	public void configInterceptor(Interceptors me) {
-		
+		// 全局异常拦截器
+		me.add(new ExceptionInterceptor());
+		// 全局跨域拦截器
+		me.add(new GlobalActionInterceptor());
 	}
 	
 	/**
