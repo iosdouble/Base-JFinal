@@ -2,8 +2,8 @@ package com.demo.appUser;
 
 import com.alibaba.fastjson.JSONObject;
 import com.demo.common.model.AppUsers;
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.util.encoders.Base64;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;

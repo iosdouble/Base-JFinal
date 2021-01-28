@@ -28,5 +28,4 @@ redis_testOnBorrow=true
 #超时时间
 redis_timeout=2
 
-#fileUpload_path = http://81.70.57.178:8081/upload/
-fileUpload_path = https://api.dhzsgh.cn/upload/
+fileUpload_path = http://xxx/upload/
