@@ -1,4 +1,12 @@
-
+## 默认数据库表
+```sql
+CREATE TABLE `blog` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(200) NOT NULL,
+  `content` mediumtext NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+```
 ## 用户数据表V1.0
 ```sql
 CREATE TABLE `dh_app_users` (
@@ -44,3 +52,4 @@ CREATE TABLE `dh_app_users` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='移动端用户';
 ```
+
