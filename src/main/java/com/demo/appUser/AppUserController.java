@@ -116,9 +116,9 @@ public class AppUserController extends Controller {
         user.setWxOpenId(openid);
         user.setWxUnionId(getPara("unionid"));
         user.setLastLoginTime(dateFormat.format(new Date()));
-        user.setTotalPoints(0);
-        user.setCurrentPoints(0);
-        user.setIsRegister("0");
+        user.setTotalPoints(0.0);
+        user.setCurrentPoints(0.0);
+        user.setIsResign("0");
         SnowflakeIdUtils s = new SnowflakeIdUtils();
         user.setId(String.valueOf(s.nextId()));
         Kv data = null;
